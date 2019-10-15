@@ -12,12 +12,12 @@ object CopyFile {
     for {
       amount <- Sync[F].delay(origin.read(buffer, 0, buffer.length))
       count <- if (amount > -1) Sync[F].delay(destination.write(buffer, 0, amount)) >> transmit(origin, destination, buffer, acc + amount)
-      else Sync[F].pure(acc) // End of read stream reached (by java.io.InputStream contract), nothing to write
-    } yield count // Returns the actual amount of bytes transmitted
+      else Sync[F].pure(acc)
+    } yield count
 
   def transfer[F[_] : Sync](origin: InputStream, destination: OutputStream): F[Long] =
     for {
-      buffer <- Sync[F].delay(new Array[Byte](1024 * 10)) // Allocated only when F is evaluated
+      buffer <- Sync[F].delay(new Array[Byte](1024 * 10))
       total <- transmit(origin, destination, buffer, 0L)
     } yield total
 
